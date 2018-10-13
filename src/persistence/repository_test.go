@@ -2,6 +2,8 @@ package persistence
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 func newRepo() *repository {
@@ -28,6 +30,30 @@ func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
 	// Output: [1 2 3 4 5]
 
 }
+
+func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
+	repo := newRepo()
+	count := 5
+	keys := make([]int, count)
+	results := make(chan int)
+
+	for i := 0; i < count; i++ {
+		go func(){
+			randomDuration := time.Duration(rand.Intn(10)) * time.Microsecond
+			time.Sleep(randomDuration)
+			results <- repo.Insert("test")
+		}()
+	}
+
+	for i := 0; i < count; i++ {
+		keys[i] = <- results
+	}
+
+	fmt.Println(keys)
+	// Output: [1 2 3 4 5]
+
+}
+
 
 func ExampleRepository_GetAtInvalidPositionReturnsError() {
 	repo := newRepo()
