@@ -38,7 +38,7 @@ func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
 	results := make(chan int)
 
 	for i := 0; i < count; i++ {
-		go func(){
+		go func() {
 			randomDuration := time.Duration(rand.Intn(10)) * time.Microsecond
 			time.Sleep(randomDuration)
 			results <- repo.Insert("test")
@@ -46,14 +46,13 @@ func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
 	}
 
 	for i := 0; i < count; i++ {
-		keys[i] = <- results
+		keys[i] = <-results
 	}
 
 	fmt.Println(keys)
 	// Output: [1 2 3 4 5]
 
 }
-
 
 func ExampleRepository_GetAtInvalidPositionReturnsError() {
 	repo := newRepo()
@@ -79,4 +78,14 @@ func ExampleRepository_GetAtValidPositionReturnsNoError() {
 	_, err := repo.Get(key)
 	fmt.Println(err)
 	// Output: <nil>
+}
+
+func ExampleRepository_Update() {
+	repo := newRepo()
+	key := repo.Insert("Hello World")
+	repo.Update(key, "Goodbye World")
+
+	value, _ := repo.Get(key)
+	fmt.Println(value)
+	// Output: Goodbye World
 }

@@ -14,7 +14,7 @@ type repository struct {
 func (repo *repository) Insert(encodedHash string) (key int) {
 	repo.Lock()
 	defer repo.Unlock()
-	position := len(repo.data)+1
+	position := len(repo.data) + 1
 	repo.data[position] = encodedHash
 	return position
 }
@@ -31,6 +31,13 @@ func (repo *repository) Get(position int) (value string, err error) {
 
 	return value, err
 
+}
+
+func (repo *repository) Update(key int, value string) {
+	repo.Lock()
+	defer repo.Unlock()
+
+	repo.data[key] = value
 }
 
 var instance *repository
