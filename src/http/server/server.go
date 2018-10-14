@@ -3,8 +3,10 @@ package server
 import (
 	"fmt"
 	"github.com/mpfilbin/go-password-hasher/src/password"
+	"github.com/mpfilbin/go-password-hasher/src/persistence"
 	"log"
 	"net/http"
+	"time"
 )
 
 func encodeAndPersistPassword(response http.ResponseWriter, request *http.Request) {
@@ -17,23 +19,39 @@ func encodeAndPersistPassword(response http.ResponseWriter, request *http.Reques
 			return
 		}
 
-		fmt.Fprintf(response, "Post from website! r.PostFrom = %v\n", request.PostForm)
-		clearTextPassword := request.FormValue("password")
-		log.Printf("Received request for %s", clearTextPassword)
+		idChannel := make(chan int)
 
-		response.Write([]byte(password.Encode(clearTextPassword)))
+		go func() {
+			dataStore := persistence.GetInstance()
+			id := dataStore.Insert("Placeholder")
+			idChannel <- id
+
+			time.Sleep(5 * time.Second)
+
+			encoded := password.Encode(request.FormValue("password"))
+			dataStore.Update(id, encoded)
+			log.Println("Persistence of encoded password complete")
+
+		}()
+
+		id := <- idChannel
+		message := fmt.Sprintf("ID will be: %v", id)
+		response.WriteHeader(http.StatusAccepted)
+		response.Write([]byte(message))
 	default:
 		http.NotFound(response, request)
 	}
 }
 
 func Listen(port int) {
-	http.HandleFunc("/hash", encodeAndPersistPassword)
+	serverMux := http.NewServeMux() // Create isolated server mutex
+
+	serverMux.HandleFunc("/hash", encodeAndPersistPassword)
 
 	address :=fmt.Sprintf(":%d", port)
 	log.Printf("Listening at %s", address)
 
-	err := http.ListenAndServe(address, nil) // set listen port
+	err := http.ListenAndServe(address, serverMux) // set listen port
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
