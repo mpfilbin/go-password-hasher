@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/mpfilbin/go-password-hasher/src/password"
 	"github.com/mpfilbin/go-password-hasher/src/persistence"
@@ -8,6 +9,13 @@ import (
 	"net/http"
 	"time"
 )
+
+type persistenceResult struct {
+	ID            int `json:"id"`
+	TimeAvailable string `json:"timeAvailable"`
+	URL           string `json:"url"`
+
+}
 
 func encodeAndPersistPassword(response http.ResponseWriter, request *http.Request) {
 	log.Printf("Received %s /hash", request.Method)
@@ -19,14 +27,20 @@ func encodeAndPersistPassword(response http.ResponseWriter, request *http.Reques
 			return
 		}
 
-		idChannel := make(chan int)
+		resultChannel := make(chan persistenceResult)
 
 		go func() {
 			dataStore := persistence.GetInstance()
+			delay := 5 * time.Second
 			id := dataStore.Insert("Placeholder")
-			idChannel <- id
+			resultChannel <- persistenceResult{
+				ID:            id,
+				TimeAvailable: time.Now().Add(delay).Format(time.RFC3339),
+				URL:           fmt.Sprintf("/hash/%v", id),
+			}
 
-			time.Sleep(5 * time.Second)
+
+			time.Sleep(delay)
 
 			encoded := password.Encode(request.FormValue("password"))
 			dataStore.Update(id, encoded)
@@ -34,10 +48,19 @@ func encodeAndPersistPassword(response http.ResponseWriter, request *http.Reques
 
 		}()
 
-		id := <- idChannel
-		message := fmt.Sprintf("ID will be: %v", id)
+		result := <-resultChannel
+
+
+		jsonContent, err := json.Marshal(result)
+
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		response.Header().Set("Content-Type", "application/json")
 		response.WriteHeader(http.StatusAccepted)
-		response.Write([]byte(message))
+		response.Write(jsonContent)
 	default:
 		http.NotFound(response, request)
 	}
