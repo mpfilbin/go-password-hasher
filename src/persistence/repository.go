@@ -8,18 +8,18 @@ import (
 
 type repository struct {
 	sync.RWMutex
-	data map[int]string
+	data map[uint64]string
 }
 
-func (repo *repository) Insert(encodedHash string) (key int) {
+func (repo *repository) Insert(encodedHash string) (key uint64) {
 	repo.Lock()
 	defer repo.Unlock()
-	position := len(repo.data) + 1
+	position := uint64(len(repo.data) + 1)
 	repo.data[position] = encodedHash
 	return position
 }
 
-func (repo *repository) Get(position int) (value string, err error) {
+func (repo *repository) Get(position uint64) (value string, err error) {
 	repo.RLock()
 	defer repo.RUnlock()
 
@@ -33,7 +33,7 @@ func (repo *repository) Get(position int) (value string, err error) {
 
 }
 
-func (repo *repository) Update(key int, value string) {
+func (repo *repository) Update(key uint64, value string) {
 	repo.Lock()
 	defer repo.Unlock()
 
@@ -55,7 +55,7 @@ func GetInstance() *repository {
 
 	if instance == nil {
 		instance = &repository{
-			data: make(map[int]string),
+			data: make(map[uint64]string),
 		}
 
 		atomic.StoreInt32(&initialized, 1)

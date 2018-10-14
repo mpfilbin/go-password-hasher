@@ -7,7 +7,7 @@ import (
 )
 
 func newRepo() *repository {
-	return &repository{data: map[int]string{}}
+	return &repository{data: map[uint64]string{}}
 }
 
 func ExampleRepository_InsertInEmptyRepositoryReturnsOne() {
@@ -20,7 +20,7 @@ func ExampleRepository_InsertInEmptyRepositoryReturnsOne() {
 func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
 	repo := newRepo()
 	count := 5
-	keys := make([]int, count)
+	keys := make([]uint64, count)
 
 	for i := 0; i < count; i++ {
 		keys[i] = repo.Insert("test")
@@ -34,8 +34,8 @@ func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
 func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
 	repo := newRepo()
 	count := 5
-	keys := make([]int, count)
-	results := make(chan int)
+	keys := make([]uint64, count)
+	results := make(chan uint64)
 
 	for i := 0; i < count; i++ {
 		go func() {
