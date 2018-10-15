@@ -33,12 +33,13 @@ func (server *ApplicationServer) RegisterHandler(route string, handler RequestHa
 		log.Printf("Received %v %v", request.Method, request.URL.Path)
 		server.stats.IncrementRequestCount()
 
-		start := time.Now()
+		start := time.Now().UnixNano()
 		handler(response, request)
-		duration := time.Since(start)
+		stop := time.Now().UnixNano()
 
+		duration := stop - start
 		server.stats.AddDuration(duration)
-		log.Printf("Request handled in %s milliseconds", duration)
+		log.Printf("Request handled in %d microseconds", duration/int64(time.Microsecond))
 	})
 }
 

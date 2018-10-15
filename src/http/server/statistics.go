@@ -8,8 +8,8 @@ import (
 
 type Statistics struct {
 	sync.RWMutex `json:"-"`
-	RequestCount       uint64 `json:"total"`
-	RequestDurations   []time.Duration `json:"-"`
+	RequestCount       int64 `json:"total"`
+	RequestDurations   []int64 `json:"-"`
 	AverageRequestTime int64 `json:"average"`
 }
 
@@ -20,10 +20,11 @@ func (stats *Statistics) IncrementRequestCount() {
 	stats.RequestCount++
 }
 
-func (stats *Statistics) AddDuration(duration time.Duration) {
+func (stats *Statistics) AddDuration(duration int64) {
 	stats.Lock()
+	defer stats.Unlock()
+
 	stats.RequestDurations = append(stats.RequestDurations, duration)
-	stats.Unlock()
 }
 
 func (stats *Statistics) UpdateAverageRequestDuration() {
@@ -35,12 +36,11 @@ func (stats *Statistics) UpdateAverageRequestDuration() {
 
 	if requestCount < 1 {
 		stats.AverageRequestTime = 0
-		stats.Unlock()
 		return
 	}
 
 	for i := 0; i < requestCount; i++ {
-		totalTimeForAllRequests += stats.RequestDurations[i].Nanoseconds() * 1000
+		totalTimeForAllRequests += stats.RequestDurations[i] / int64(time.Microsecond)
 	}
 
 	stats.AverageRequestTime = totalTimeForAllRequests / int64(requestCount)
