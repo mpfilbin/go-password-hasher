@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,18 +13,33 @@ import (
 
 type RequestHandler func(http.ResponseWriter, *http.Request)
 
+
 type ApplicationServer struct {
 	serveMux *http.ServeMux
+	stats *Statistics
 }
 
 
 func NewAppServer() *ApplicationServer{
-	return &ApplicationServer{serveMux: http.NewServeMux()}
+	return &ApplicationServer{
+		serveMux: http.NewServeMux(),
+		stats: &Statistics{},
+	}
 }
 
 
 func (server *ApplicationServer) RegisterHandler(route string, handler RequestHandler) {
-	server.serveMux.HandleFunc(route, handler)
+	server.serveMux.HandleFunc(route, func(response http.ResponseWriter, request *http.Request){
+		log.Printf("Received %v %v", request.Method, request.URL.Path)
+		server.stats.IncrementRequestCount()
+
+		start := time.Now()
+		handler(response, request)
+		duration := time.Since(start)
+
+		server.stats.AddDuration(duration)
+		log.Printf("Request handled in %s milliseconds", duration)
+	})
 }
 
 func (server *ApplicationServer) shutdown(response http.ResponseWriter, request *http.Request) {
@@ -39,9 +55,28 @@ func (server *ApplicationServer) shutdown(response http.ResponseWriter, request 
 	}
 }
 
+func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, request *http.Request) {
+	if request.Method == http.MethodGet {
+		server.stats.UpdateAverageRequestDuration()
+		jsonContent, err := json.Marshal(server.stats)
+
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		response.Header().Set("Content-Type", "application/json")
+		response.Write(jsonContent)
+	} else {
+		http.NotFound(response, request)
+	}
+}
+
+
 func (server *ApplicationServer) Listen(port int) {
 
 	server.RegisterHandler("/shutdown", server.shutdown)
+	server.RegisterHandler("/stats", server.reportStatistics)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
