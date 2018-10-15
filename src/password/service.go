@@ -20,8 +20,7 @@ type persistenceResult struct {
 
 
 func LookupEncodingByID(response http.ResponseWriter, request *http.Request) {
-	switch request.Method {
-	case "GET":
+	if request.Method == http.MethodGet {
 		idSegment := strings.TrimPrefix(request.URL.Path, "/hash/")
 		id, err := strconv.ParseInt(idSegment, 10, 64)
 
@@ -35,14 +34,13 @@ func LookupEncodingByID(response http.ResponseWriter, request *http.Request) {
 		dataStore := persistence.GetInstance()
 		encodedHash, err := dataStore.Get(uint64(id))
 		response.Write([]byte(encodedHash))
-	default:
-		http.NotFound(response, request)
+		return
 	}
+	http.NotFound(response, request)
 }
 
 func EncodeAndPersist(response http.ResponseWriter, request *http.Request) {
-	switch request.Method {
-	case "POST":
+	if request.Method == http.MethodPost {
 		if err := request.ParseForm(); err != nil {
 			log.Printf("Error - Unable to parse form data %v", err)
 			http.Error(response, "Invalid form data", http.StatusBadRequest)
@@ -83,7 +81,8 @@ func EncodeAndPersist(response http.ResponseWriter, request *http.Request) {
 		response.Header().Set("Content-Type", "application/json")
 		response.WriteHeader(http.StatusAccepted)
 		response.Write(jsonContent)
-	default:
-		http.NotFound(response, request)
+		return
 	}
+
+	http.NotFound(response, request)
 }

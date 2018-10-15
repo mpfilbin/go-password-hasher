@@ -13,12 +13,10 @@ import (
 
 type RequestHandler func(http.ResponseWriter, *http.Request)
 
-
 type ApplicationServer struct {
 	serveMux *http.ServeMux
 	stats *Statistics
 }
-
 
 func NewAppServer() *ApplicationServer{
 	return &ApplicationServer{
@@ -26,7 +24,6 @@ func NewAppServer() *ApplicationServer{
 		stats: &Statistics{},
 	}
 }
-
 
 func (server *ApplicationServer) RegisterHandler(route string, handler RequestHandler) {
 	server.serveMux.HandleFunc(route, func(response http.ResponseWriter, request *http.Request){
@@ -51,9 +48,9 @@ func (server *ApplicationServer) shutdown(response http.ResponseWriter, request 
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 		process.Signal(os.Interrupt)
-	} else {
-		http.NotFound(response, request)
+		return
 	}
+	http.NotFound(response, request)
 }
 
 func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, request *http.Request) {
@@ -68,11 +65,10 @@ func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, 
 
 		response.Header().Set("Content-Type", "application/json")
 		response.Write(jsonContent)
-	} else {
-		http.NotFound(response, request)
+		return
 	}
+	http.NotFound(response, request)
 }
-
 
 func (server *ApplicationServer) Listen(port int) {
 
