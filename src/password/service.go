@@ -12,7 +12,6 @@ import (
 )
 
 type persistenceResult struct {
-	ID            uint64 `json:"id"`
 	TimeAvailable string `json:"timeAvailable"`
 	URL           string `json:"url"`
 
@@ -54,7 +53,6 @@ func EncodeAndPersist(response http.ResponseWriter, request *http.Request) {
 			delay := 5 * time.Second
 			id := dataStore.Insert("")
 			resultChannel <- persistenceResult{
-				ID:            id,
 				TimeAvailable: time.Now().Add(delay).Format(time.RFC3339),
 				URL:           fmt.Sprintf("/hash/%v", id),
 			}
