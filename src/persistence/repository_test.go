@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func newRepo() *repository {
-	return &repository{data: map[uint64]string{}}
+func newRepo() *Repository {
+	return &Repository{data: map[uint64]string{}}
 }
 
 func ExampleRepository_InsertInEmptyRepositoryReturnsOne() {

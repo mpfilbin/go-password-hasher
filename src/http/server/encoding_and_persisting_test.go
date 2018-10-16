@@ -1,24 +1,23 @@
-package password
+package server
 
 import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"regexp"
 	"strings"
 	"testing"
 )
 
-
 func TestEncodeAndPersistWithValidFormDataReturnsStatusAccepted(t *testing.T) {
+	application := NewAppServer()
 	formData := url.Values{}
 	formData.Add("password", "P@ssW0rd")
 
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(EncodeAndPersist)
+	handler := http.HandlerFunc(application.EncodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
@@ -28,13 +27,14 @@ func TestEncodeAndPersistWithValidFormDataReturnsStatusAccepted(t *testing.T) {
 }
 
 func TestEncodeAndPersistWithValidFormDataReturnsJSONContentType(t *testing.T) {
+	application := NewAppServer()
 	formData := url.Values{}
 	formData.Add("password", "P@ssW0rd")
 
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(EncodeAndPersist)
+	handler := http.HandlerFunc(application.EncodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
@@ -44,13 +44,14 @@ func TestEncodeAndPersistWithValidFormDataReturnsJSONContentType(t *testing.T) {
 }
 
 func TestEncodeAndPersistWithValidFormDataReturnsPersistenceResultWithLookupURL(t *testing.T) {
+	application := NewAppServer()
 	formData := url.Values{}
 	formData.Add("password", "P@ssW0rd")
 
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(EncodeAndPersist)
+	handler := http.HandlerFunc(application.EncodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
@@ -61,25 +62,20 @@ func TestEncodeAndPersistWithValidFormDataReturnsPersistenceResultWithLookupURL(
 		t.Error(err)
 	}
 
-	ok, err := regexp.Match("\\/hash\\/\\d+", []byte(result.URL))
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if !ok {
-		t.Errorf("Handler returned wrong payload. Expected %v to match /hash/{number}", result.URL)
+	if result.URL != "/hash/1" {
+		t.Errorf("Handler returned wrong payload. Expected %v to match %v", result.URL, "/hash/1")
 	}
 }
 
 func TestEncodeAndPersistWithValidFormDataReturnsPersistenceResultWithTimeAvailable(t *testing.T) {
+	application := NewAppServer()
 	formData := url.Values{}
 	formData.Add("password", "P@ssW0rd")
 
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(EncodeAndPersist)
+	handler := http.HandlerFunc(application.EncodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
