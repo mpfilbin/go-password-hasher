@@ -21,7 +21,6 @@ func (repo *Repository) Insert(encodedHash string) (key int64) {
 	return position
 }
 
-
 //Get retrieves a string value for a given key
 func (repo *Repository) Get(key int64) (value string, err error) {
 	repo.RLock()

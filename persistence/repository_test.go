@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 func ExampleRepository_Insert_EmptyRepositoryReturnsOne() {
 	repo := NewRepository()
 	key := repo.Insert("Hello World")
