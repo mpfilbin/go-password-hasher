@@ -3,23 +3,22 @@ package persistence
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 )
 
-type repository struct {
+type Repository struct {
 	sync.RWMutex
-	data map[int]string
+	data map[int64]string
 }
 
-func (repo *repository) Insert(encodedHash string) (key int) {
+func (repo *Repository) Insert(encodedHash string) (key int64) {
 	repo.Lock()
 	defer repo.Unlock()
-	position := len(repo.data) + 1
+	position := int64(len(repo.data) + 1)
 	repo.data[position] = encodedHash
 	return position
 }
 
-func (repo *repository) Get(position int) (value string, err error) {
+func (repo *Repository) Get(position int64) (value string, err error) {
 	repo.RLock()
 	defer repo.RUnlock()
 
@@ -33,34 +32,15 @@ func (repo *repository) Get(position int) (value string, err error) {
 
 }
 
-func (repo *repository) Update(key int, value string) {
+func (repo *Repository) Update(key int64, value string) {
 	repo.Lock()
 	defer repo.Unlock()
 
 	repo.data[key] = value
 }
 
-var instance *repository
-var mu sync.Mutex
-var initialized int32
-
-func GetInstance() *repository {
-
-	if atomic.LoadInt32(&initialized) == 1 {
-		return instance
+func NewRepository() *Repository {
+	return &Repository{
+		data: make(map[int64]string),
 	}
-
-	mu.Lock()
-	defer mu.Unlock()
-
-	if instance == nil {
-		instance = &repository{
-			data: make(map[int]string),
-		}
-
-		atomic.StoreInt32(&initialized, 1)
-	}
-
-	return instance
-
 }
