@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mpfilbin/go-password-hasher/src/password"
-	"github.com/mpfilbin/go-password-hasher/src/persistence"
+	"github.com/mpfilbin/go-password-hasher/password"
+	"github.com/mpfilbin/go-password-hasher/persistence"
 	"log"
 	"net/http"
 	"os"
@@ -20,25 +20,24 @@ type RequestHandler func(http.ResponseWriter, *http.Request)
 type persistenceResult struct {
 	TimeAvailable string `json:"timeAvailable"`
 	URL           string `json:"url"`
-
 }
 
 type ApplicationServer struct {
-	serveMux *http.ServeMux
-	stats *Statistics
+	serveMux  *http.ServeMux
+	stats     *Statistics
 	dataStore *persistence.Repository
 }
 
-func NewAppServer() *ApplicationServer{
+func NewAppServer() *ApplicationServer {
 	return &ApplicationServer{
-		serveMux: http.NewServeMux(),
-		stats: &Statistics{},
+		serveMux:  http.NewServeMux(),
+		stats:     &Statistics{},
 		dataStore: persistence.NewRepository(),
 	}
 }
 
 func (server *ApplicationServer) RegisterHandler(route string, handler RequestHandler) {
-	server.serveMux.HandleFunc(route, func(response http.ResponseWriter, request *http.Request){
+	server.serveMux.HandleFunc(route, func(response http.ResponseWriter, request *http.Request) {
 		log.Printf("Received %v %v", request.Method, request.URL.Path)
 		server.stats.IncrementRequestCount()
 
@@ -46,7 +45,7 @@ func (server *ApplicationServer) RegisterHandler(route string, handler RequestHa
 		handler(response, request)
 		stop := time.Now().UnixNano()
 
-		duration := (stop - start)/int64(time.Microsecond)
+		duration := (stop - start) / int64(time.Microsecond)
 		server.stats.AddDuration(duration)
 		log.Printf("Request handled in %d microseconds", duration)
 	})
@@ -116,7 +115,6 @@ func (server *ApplicationServer) EncodeAndPersist(response http.ResponseWriter, 
 				URL:           fmt.Sprintf("/hash/%v", id),
 			}
 
-
 			time.Sleep(delay)
 
 			encoded := password.Encode(request.FormValue("password"))
@@ -152,7 +150,7 @@ func (server *ApplicationServer) Listen(port int) {
 
 	address := fmt.Sprintf(":%d", port)
 	httpServer := &http.Server{
-		Addr:address,
+		Addr:    address,
 		Handler: server.serveMux,
 	}
 

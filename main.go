@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mpfilbin/go-password-hasher/src/http/server"
+	"github.com/mpfilbin/go-password-hasher/http/server"
 )
 
 func main() {
