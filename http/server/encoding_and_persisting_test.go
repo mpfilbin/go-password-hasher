@@ -17,7 +17,7 @@ func TestEncodeAndPersistWithValidFormDataReturnsStatusAccepted(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(application.EncodeAndPersist)
+	handler := http.HandlerFunc(application.encodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
@@ -34,7 +34,7 @@ func TestEncodeAndPersistWithValidFormDataReturnsJSONContentType(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(application.EncodeAndPersist)
+	handler := http.HandlerFunc(application.encodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
@@ -51,12 +51,12 @@ func TestEncodeAndPersistWithValidFormDataReturnsPersistenceResultWithLookupURL(
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(application.EncodeAndPersist)
+	handler := http.HandlerFunc(application.encodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
 	responseContent := responseRecorder.Body.Bytes()
-	var result persistenceResult
+	var result encodingResult
 
 	if err := json.Unmarshal(responseContent, &result); err != nil {
 		t.Error(err)
@@ -75,12 +75,12 @@ func TestEncodeAndPersistWithValidFormDataReturnsPersistenceResultWithTimeAvaila
 	request := httptest.NewRequest(http.MethodPost, "/hash", strings.NewReader(formData.Encode()))
 
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(application.EncodeAndPersist)
+	handler := http.HandlerFunc(application.encodeAndPersist)
 
 	handler.ServeHTTP(responseRecorder, request)
 
 	responseContent := responseRecorder.Body.Bytes()
-	var result persistenceResult
+	var result encodingResult
 
 	if err := json.Unmarshal(responseContent, &result); err != nil {
 		t.Error(err)

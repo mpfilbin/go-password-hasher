@@ -15,28 +15,30 @@ import (
 	"time"
 )
 
-type RequestHandler func(http.ResponseWriter, *http.Request)
+type requestHandler func(http.ResponseWriter, *http.Request)
 
-type persistenceResult struct {
+type encodingResult struct {
 	TimeAvailable string `json:"timeAvailable"`
 	URL           string `json:"url"`
 }
 
+// ApplicationServer provides an HTTP interface to enable the encoding and retrieval of passwords
 type ApplicationServer struct {
 	serveMux  *http.ServeMux
-	stats     *Statistics
+	stats     *statistics
 	dataStore *persistence.Repository
 }
 
+// NewAppServer instantiates a new instance of ApplicationServer
 func NewAppServer() *ApplicationServer {
 	return &ApplicationServer{
 		serveMux:  http.NewServeMux(),
-		stats:     &Statistics{},
+		stats:     &statistics{},
 		dataStore: persistence.NewRepository(),
 	}
 }
 
-func (server *ApplicationServer) RegisterHandler(route string, handler RequestHandler) {
+func (server *ApplicationServer) registerHandler(route string, handler requestHandler) {
 	server.serveMux.HandleFunc(route, func(response http.ResponseWriter, request *http.Request) {
 		log.Printf("Received %v %v", request.Method, request.URL.Path)
 		server.stats.IncrementRequestCount()
@@ -81,7 +83,7 @@ func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, 
 	http.NotFound(response, request)
 }
 
-func (server *ApplicationServer) LookupEncodingByID(response http.ResponseWriter, request *http.Request) {
+func (server *ApplicationServer) lookupEncodingByID(response http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodGet {
 		idSegment := strings.TrimPrefix(request.URL.Path, "/hash/")
 		id, err := strconv.ParseInt(idSegment, 10, 64)
@@ -98,7 +100,7 @@ func (server *ApplicationServer) LookupEncodingByID(response http.ResponseWriter
 	http.NotFound(response, request)
 }
 
-func (server *ApplicationServer) EncodeAndPersist(response http.ResponseWriter, request *http.Request) {
+func (server *ApplicationServer) encodeAndPersist(response http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodPost {
 		if err := request.ParseForm(); err != nil {
 			log.Printf("Error - Unable to parse form data %v", err)
@@ -106,11 +108,11 @@ func (server *ApplicationServer) EncodeAndPersist(response http.ResponseWriter, 
 			return
 		}
 
-		resultChannel := make(chan persistenceResult)
+		resultChannel := make(chan encodingResult)
 		go func() {
 			delay := 5 * time.Second
 			id := server.dataStore.Insert("")
-			resultChannel <- persistenceResult{
+			resultChannel <- encodingResult{
 				TimeAvailable: time.Now().Add(delay).Format(time.RFC3339),
 				URL:           fmt.Sprintf("/hash/%v", id),
 			}
@@ -139,29 +141,34 @@ func (server *ApplicationServer) EncodeAndPersist(response http.ResponseWriter, 
 	http.NotFound(response, request)
 }
 
+// Listen binds the instance of ApplicationServer to a network port so that it may receive HTTP traffic
 func (server *ApplicationServer) Listen(port int) {
-	server.RegisterHandler("/shutdown", server.shutdown)
-	server.RegisterHandler("/stats", server.reportStatistics)
-	server.RegisterHandler("/hash", server.EncodeAndPersist)
-	server.RegisterHandler("/hash/", server.LookupEncodingByID)
+	server.registerHandler("/shutdown", server.shutdown)
+	server.registerHandler("/stats", server.reportStatistics)
+	server.registerHandler("/hash", server.encodeAndPersist)
+	server.registerHandler("/hash/", server.lookupEncodingByID)
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
+	idleConnsClosed := make(chan struct{})
 
-	address := fmt.Sprintf(":%d", port)
 	httpServer := &http.Server{
-		Addr:    address,
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: server.serveMux,
 	}
 
-	log.Printf("Listening on %v", address)
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
-			log.Fatal(err.Error())
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+		if err := httpServer.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Printf("HTTP server Shutdown: %v", err)
 		}
 	}()
 
-	<-stop
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	httpServer.Shutdown(ctx)
+	log.Printf("Listening on %v", httpServer.Addr)
+	if err := httpServer.ListenAndServe(); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	<-idleConnsClosed
 }

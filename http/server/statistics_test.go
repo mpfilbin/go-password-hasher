@@ -3,7 +3,7 @@ package server
 import "fmt"
 
 func ExampleStatistics_IncrementRequestCount() {
-	stats := &Statistics{}
+	stats := &statistics{}
 
 	stats.IncrementRequestCount()
 
@@ -12,7 +12,7 @@ func ExampleStatistics_IncrementRequestCount() {
 }
 
 func ExampleStatistics_AddDuration() {
-	stats := &Statistics{}
+	stats := &statistics{}
 
 	stats.AddDuration(5)
 	stats.AddDuration(6)
@@ -23,7 +23,7 @@ func ExampleStatistics_AddDuration() {
 }
 
 func ExampleStatistics_UpdateAverageRequestDuration() {
-	stats := &Statistics{}
+	stats := &statistics{}
 
 	stats.IncrementRequestCount()
 	stats.AddDuration(10)
@@ -37,7 +37,7 @@ func ExampleStatistics_UpdateAverageRequestDuration() {
 }
 
 func ExampleStatistics_UpdateAverageRequestDurationWithZeroRequests() {
-	stats := &Statistics{}
+	stats := &statistics{}
 	stats.UpdateAverageRequestDuration()
 	fmt.Println(stats.AverageRequestTime)
 	// Output: 0
