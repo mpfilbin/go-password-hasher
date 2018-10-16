@@ -7,18 +7,18 @@ import (
 
 type Repository struct {
 	sync.RWMutex
-	data map[uint64]string
+	data map[int64]string
 }
 
-func (repo *Repository) Insert(encodedHash string) (key uint64) {
+func (repo *Repository) Insert(encodedHash string) (key int64) {
 	repo.Lock()
 	defer repo.Unlock()
-	position := uint64(len(repo.data) + 1)
+	position := int64(len(repo.data) + 1)
 	repo.data[position] = encodedHash
 	return position
 }
 
-func (repo *Repository) Get(position uint64) (value string, err error) {
+func (repo *Repository) Get(position int64) (value string, err error) {
 	repo.RLock()
 	defer repo.RUnlock()
 
@@ -32,7 +32,7 @@ func (repo *Repository) Get(position uint64) (value string, err error) {
 
 }
 
-func (repo *Repository) Update(key uint64, value string) {
+func (repo *Repository) Update(key int64, value string) {
 	repo.Lock()
 	defer repo.Unlock()
 
@@ -41,6 +41,6 @@ func (repo *Repository) Update(key uint64, value string) {
 
 func NewRepository() *Repository {
 	return &Repository{
-		data: make(map[uint64]string),
+		data: make(map[int64]string),
 	}
 }

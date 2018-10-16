@@ -6,21 +6,17 @@ import (
 	"time"
 )
 
-func newRepo() *Repository {
-	return &Repository{data: map[uint64]string{}}
-}
-
 func ExampleRepository_InsertInEmptyRepositoryReturnsOne() {
-	repo := newRepo()
+	repo := NewRepository()
 	key := repo.Insert("Hello World")
 	fmt.Println(key)
 	// Output: 1
 }
 
 func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
-	repo := newRepo()
+	repo := NewRepository()
 	count := 5
-	keys := make([]uint64, count)
+	keys := make([]int64, count)
 
 	for i := 0; i < count; i++ {
 		keys[i] = repo.Insert("test")
@@ -32,10 +28,10 @@ func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
 }
 
 func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
-	repo := newRepo()
+	repo := NewRepository()
 	count := 5
-	keys := make([]uint64, count)
-	results := make(chan uint64)
+	keys := make([]int64, count)
+	results := make(chan int64)
 
 	for i := 0; i < count; i++ {
 		go func() {
@@ -55,7 +51,7 @@ func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
 }
 
 func ExampleRepository_GetAtInvalidPositionReturnsError() {
-	repo := newRepo()
+	repo := NewRepository()
 
 	_, err := repo.Get(1)
 	fmt.Println(err)
@@ -63,7 +59,7 @@ func ExampleRepository_GetAtInvalidPositionReturnsError() {
 }
 
 func ExampleRepository_GetAtValidPositionReturnsStoredValue() {
-	repo := newRepo()
+	repo := NewRepository()
 	key := repo.Insert("This is a test")
 
 	value, _ := repo.Get(key)
@@ -72,7 +68,7 @@ func ExampleRepository_GetAtValidPositionReturnsStoredValue() {
 }
 
 func ExampleRepository_GetAtValidPositionReturnsNoError() {
-	repo := newRepo()
+	repo := NewRepository()
 	key := repo.Insert("This is a test")
 
 	_, err := repo.Get(key)
@@ -81,7 +77,7 @@ func ExampleRepository_GetAtValidPositionReturnsNoError() {
 }
 
 func ExampleRepository_Update() {
-	repo := newRepo()
+	repo := NewRepository()
 	key := repo.Insert("Hello World")
 	repo.Update(key, "Goodbye World")
 
