@@ -34,9 +34,9 @@ func (server *ApplicationServer) RegisterHandler(route string, handler RequestHa
 		handler(response, request)
 		stop := time.Now().UnixNano()
 
-		duration := stop - start
+		duration := (stop - start)/int64(time.Microsecond)
 		server.stats.AddDuration(duration)
-		log.Printf("Request handled in %d microseconds", duration/int64(time.Microsecond))
+		log.Printf("Request handled in %d microseconds", duration)
 	})
 }
 
