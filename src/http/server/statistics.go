@@ -4,7 +4,6 @@ import (
 	"sync"
 )
 
-
 type Statistics struct {
 	sync.RWMutex            `json:"-"`
 	RequestCount            int64 `json:"total"`
