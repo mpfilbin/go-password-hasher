@@ -14,7 +14,7 @@ LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
-.PHONY: all build clean install uninstall fmt simplify check run
+.PHONY: all build clean install uninstall fmt simplify check run test coverage
 
 all: check install
 
@@ -46,3 +46,9 @@ check:
 
 run: install
 	@$(TARGET)
+
+test:
+	@go test ./...
+
+coverage:
+	@go test ./... -cover
