@@ -92,7 +92,7 @@ func (server *ApplicationServer) LookupEncodingByID(response http.ResponseWriter
 			http.Error(response, err.Error(), http.StatusBadRequest)
 		}
 
-		encodedHash, err := server.dataStore.Get(uint64(id))
+		encodedHash, err := server.dataStore.Get(int64(id))
 		response.Write([]byte(encodedHash))
 		return
 	}

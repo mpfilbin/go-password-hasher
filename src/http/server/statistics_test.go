@@ -35,3 +35,10 @@ func ExampleStatistics_UpdateAverageRequestDuration() {
 	fmt.Println(stats.AverageRequestTime)
 	// Output: 13
 }
+
+func ExampleStatistics_UpdateAverageRequestDurationWithZeroRequests() {
+	stats := &Statistics{}
+	stats.UpdateAverageRequestDuration()
+	fmt.Println(stats.AverageRequestTime)
+	// Output: 0
+}
