@@ -8,8 +8,9 @@ TARGET := $(shell echo $${PWD\#\#*/})
 VERSION := 1.0.0
 BUILD := `git rev-parse HEAD`
 
-# Use linker flags to provide version/build settings to the target
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+# Use linker flags to provide version/build settings to the target and strip DWARF debugging tables
+# inspired by: https://blog.filippo.io/shrink-your-go-binaries-with-this-one-weird-trick/
+LDFLAGS=-ldflags "-s -w -X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")

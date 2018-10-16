@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-func ExampleRepository_InsertInEmptyRepositoryReturnsOne() {
+func ExampleRepository_Insert_EmptyRepositoryReturnsOne() {
 	repo := NewRepository()
 	key := repo.Insert("Hello World")
 	fmt.Println(key)
 	// Output: 1
 }
 
-func ExampleRepository_InsertMultipleItemsReturnsSequentialKeys() {
+func ExampleRepository_Insert_MultipleItemsReturnsSequentialKeys() {
 	repo := NewRepository()
 	count := 5
 	keys := make([]int64, count)
@@ -50,7 +50,7 @@ func ExampleRepository_ConcurrentInsertsGuaranteedSequentialKeys() {
 
 }
 
-func ExampleRepository_GetAtInvalidPositionReturnsError() {
+func ExampleRepository_Get_AtInvalidPositionReturnsError() {
 	repo := NewRepository()
 
 	_, err := repo.Get(1)
@@ -58,7 +58,7 @@ func ExampleRepository_GetAtInvalidPositionReturnsError() {
 	// Output: cannot access data at position 1
 }
 
-func ExampleRepository_GetAtValidPositionReturnsStoredValue() {
+func ExampleRepository_Get_AtValidPositionReturnsStoredValue() {
 	repo := NewRepository()
 	key := repo.Insert("This is a test")
 
@@ -67,7 +67,7 @@ func ExampleRepository_GetAtValidPositionReturnsStoredValue() {
 	// Output: This is a test
 }
 
-func ExampleRepository_GetAtValidPositionReturnsNoError() {
+func ExampleRepository_Get_AtValidPositionReturnsNoError() {
 	repo := NewRepository()
 	key := repo.Insert("This is a test")
 
