@@ -38,8 +38,8 @@ func TestEncodeAndPersistWithValidFormDataReturnsJSONContentType(t *testing.T) {
 
 	handler.ServeHTTP(responseRecorder, request)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong content type. Got %v, Wanted %v", contentType, "application/json")
+	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != ContentTypeJson {
+		t.Errorf("Handler returned wrong content type. Got %v, Wanted %v", contentType, ContentTypeJson)
 	}
 }
 

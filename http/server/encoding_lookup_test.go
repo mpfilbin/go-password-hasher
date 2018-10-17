@@ -64,8 +64,8 @@ func TestLookupEncodingByIDWithValidIDReturnsPlainTextContentType(t *testing.T) 
 
 	response := issueEncodedPasswordLookupRequest(application, result.URL)
 
-	if contentType := response.Header().Get("Content-Type"); contentType != "text/plain; charset=utf-8" {
-		t.Errorf("Handler returned wrong Content Type. Got %v, Wanted %v", contentType, "text/plain; charset=utf-8")
+	if contentType := response.Header().Get("Content-Type"); contentType != ContentTypePlaintext {
+		t.Errorf("Handler returned wrong Content Type. Got %v, Wanted %v", contentType, ContentTypePlaintext)
 	}
 }
 

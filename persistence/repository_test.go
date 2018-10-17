@@ -55,7 +55,7 @@ func ExampleRepository_Get_AtInvalidPositionReturnsError() {
 
 	_, err := repo.Get(1)
 	fmt.Println(err)
-	// Output: cannot access data at position 1
+	// Output: cannot access data for key 1
 }
 
 func ExampleRepository_Get_AtValidPositionReturnsStoredValue() {

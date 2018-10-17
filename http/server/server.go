@@ -15,6 +15,11 @@ import (
 	"time"
 )
 
+const (
+	ContentTypeJson      = "application/json; charset=utf-8"
+	ContentTypePlaintext = "text/plain; charset=utf-8"
+)
+
 type requestHandler func(http.ResponseWriter, *http.Request)
 
 type encodingResult struct {
@@ -76,7 +81,7 @@ func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, 
 			return
 		}
 
-		response.Header().Set("Content-Type", "application/json")
+		response.Header().Set("Content-Type", ContentTypeJson)
 		response.Write(jsonContent)
 		return
 	}
@@ -133,7 +138,7 @@ func (server *ApplicationServer) encodeAndPersist(response http.ResponseWriter, 
 			return
 		}
 
-		response.Header().Set("Content-Type", "application/json")
+		response.Header().Set("Content-Type", ContentTypeJson)
 		response.WriteHeader(http.StatusAccepted)
 		response.Write(jsonContent)
 		return
