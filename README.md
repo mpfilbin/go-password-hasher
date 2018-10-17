@@ -1,6 +1,6 @@
 # Implementation of A Password Hasher in Go
 
-`go-password-hasher` provides an HTTP API for the encoding and persistence of passwords.
+`go-password-hasher` provides an HTTP API for the encoding and persistence of passwords. `go-password-hasher`'s HTTP interface is available over port 8001.
 
 ## HTTP API
 
@@ -93,6 +93,23 @@ Date: Tue, 16 Oct 2018 13:38:45 GMT
 ```
 
 ## Compilation
-
+`go-password-hasher` was developed against `go 1.11`, but may compile and run on earlier versions. To compile the source code into a single, distributable binary, simply type `make build` from the project's root directory. If compilation is successful, the resulting executable can be found in the `bin` directory.
 
 ## Running
+
+If you would rather run the application outright without AOT compilation, you can execute the following command from a shell in the project's root directory:
+```shell
+$ go run main.go
+```
+You may provide additional options and compilation flags, so please see `go help run` for details.
+
+## Development
+
+### Running Unit Tests
+All of `go-password-hashser`'s unit tests may be found alongside their implementation files and have a `_test.go` filename suffix. Tests may be executed on a per-package basies using `go test` from the commandline:
+
+```shell
+go test github.com/mpfilbin/go-password-hasher/password
+```
+
+Alternatively, you may run all of the project's unit tests by executing `make test` from the project's root directory.
