@@ -5,7 +5,7 @@
 ## HTTP API
 
 ### Creating a new encoded password hash
-Clients request a new encoded password hash by issuing a HTTP `POST` request to the `/hash` endpoint.
+Clients request a new encoded password hash by issuing an HTTP `POST` request to the `/hash` endpoint.
 
 **Request:**
 ```http
@@ -13,7 +13,7 @@ POST http://localhost:8001/hash
 password={password}
 ```
 
-Hashing and encoding is performed asynchronously after the request is made. The client is returned an immediate response with a payload containing the URL where the encoded hash may be accessed and a timestamp indicating when the request may be issued.
+Hashing and encoding are performed asynchronously after the request is made. The client is returned an immediate response with a payload containing the URL where the encoded hash may be accessed and a timestamp indicating when the request may be issued.
 
 **Response:**
 ```http
@@ -30,7 +30,7 @@ Date: Tue, 16 Oct 2018 13:22:37 GMT
 ```
 
 ### Fetching an existing encoded password hash
-After a client has issued a request to generate a new encoded password hash and have awaited the prescribed amount of time, they may issue a HTTP `GET` request to the URI provided in the response payload from the 
+After a client has issued a request to generate a new encoded password hash and have awaited the prescribed amount of time, they may issue an HTTP `GET` request to the URI provided in the response payload from the 
 create request.
 
 **Request:**
@@ -77,13 +77,13 @@ Date: Tue, 16 Oct 2018 13:34:45 GMT
 ```
 
 ### Graceful, Remote Shutdown
-The `go-password-hasher` application server may be remotely shutdown by issuing a HTTP `GET` request to the `/shutdown` endpoint.
+The `go-password-hasher` application server may be remotely shut down by issuing an HTTP `GET` request to the `/shutdown` endpoint.
 
 ```http
 GET http://localhost:8001/shutdown
 ```
 
-Once the request is issued, the application server will stop accepting future requests and handle all inflight requests before terminating. Once the response is received no further requests may be issued.
+Once the request is issued, the application server will stop accepting future requests and handle all in-flight requests before terminating. Once the response is received no further requests may be issued.
 
 **Response**
 ```http
@@ -93,7 +93,7 @@ Date: Tue, 16 Oct 2018 13:38:45 GMT
 ```
 
 ## Compilation
-`go-password-hasher` was developed against `go 1.11`, but may compile and run on earlier versions. To compile the source code into a single, distributable binary, simply type `make build` from the project's root directory. If compilation is successful, the resulting executable can be found in the `bin` directory.
+`go-password-hasher` was developed against `go 1.11`, but may compile and run on earlier versions. To compile the source code into a single, distributable binary, type `make build` from the project's root directory. If the compilation is successful, the resulting executable can be found in the `bin` directory.
 
 ## Running
 
@@ -105,11 +105,17 @@ You may provide additional options and compilation flags, so please see `go help
 
 ## Development
 
+### Verifying Commit Authorship and Integrity
+Each commit to the repository has been [signed with my PGP private key](https://en.wikipedia.org/wiki/Pretty_Good_Privacy#Digital_signatures). Github has [built-in verification features](https://blog.github.com/2016-04-05-gpg-signature-verification/); however, you are free to verify them yourself once you've clone this repository to your local machine. My public key is freely distributed and [may be found on most public key servers](https://pgp.mit.edu/pks/lookup?search=michael.filbin%40gmail.com&op=index&fingerprint=on). If you have a GPG implementation installed on your machine,  my public key from the key server and [follow these instructions on verification](https://git-scm.com/docs/git-verify-commit).
+
 ### Running Unit Tests
-All of `go-password-hashser`'s unit tests may be found alongside their implementation files and have a `_test.go` filename suffix. Tests may be executed on a per-package basies using `go test` from the commandline:
+All of `go-password-hasher`'s unit tests may be found alongside their implementation files and have a `_test.go` filename suffix. Tests may be executed on a per-package basis using `go test` from the command line:
 
 ```shell
 go test github.com/mpfilbin/go-password-hasher/password
 ```
 
-Alternatively, you may run all of the project's unit tests by executing `make test` from the project's root directory.
+Alternatively, you may run all of the project's unit tests by executing `make test` from the project's root directory. If you want to have `go`'s test runner calculate the percentage of test coverage, you may run the tests with the coverage option by typing `make coverage` from the project's root directory.
+
+### Feedback and Defects
+I am a novice `go` developer, and you may find non-idiomatic expressions in my code. You may also find obvious bugs and faulty logic. Please feel free to submit feedback or ask questions via the [issues](https://github.com/mpfilbin/go-password-hasher/issues) section of this project's Github repository.
