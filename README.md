@@ -61,7 +61,7 @@ GET http://localhost:8080/stats
 
 The response payload contains two values:
 * **total** - A running total of requests serviced by the application server
-* **average** - The average duration (in milliseconds) for the server to respond to a request
+* **average** - The average duration (in microseconds) for the server to respond to a request
 
 **Response**
 ```http
