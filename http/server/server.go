@@ -59,7 +59,7 @@ func (server *ApplicationServer) registerHandler(route string, handler requestHa
 }
 
 func (server *ApplicationServer) shutdown(response http.ResponseWriter, request *http.Request) {
-	if request.Method == http.MethodGet {
+	if request.Method == http.MethodPost {
 		process, err := os.FindProcess(os.Getpid())
 		if err != nil {
 			log.Printf("Unable to terminate process due to error: %v", err.Error())
