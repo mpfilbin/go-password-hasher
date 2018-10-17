@@ -15,6 +15,11 @@ import (
 	"time"
 )
 
+const (
+	ContentTypeJson      = "application/json; charset=utf-8"
+	ContentTypePlaintext = "text/plain; charset=utf-8"
+)
+
 type requestHandler func(http.ResponseWriter, *http.Request)
 
 type encodingResult struct {
@@ -54,7 +59,7 @@ func (server *ApplicationServer) registerHandler(route string, handler requestHa
 }
 
 func (server *ApplicationServer) shutdown(response http.ResponseWriter, request *http.Request) {
-	if request.Method == http.MethodGet {
+	if request.Method == http.MethodPost {
 		process, err := os.FindProcess(os.Getpid())
 		if err != nil {
 			log.Printf("Unable to terminate process due to error: %v", err.Error())
@@ -76,7 +81,7 @@ func (server *ApplicationServer) reportStatistics(response http.ResponseWriter, 
 			return
 		}
 
-		response.Header().Set("Content-Type", "application/json")
+		response.Header().Set("Content-Type", ContentTypeJson)
 		response.Write(jsonContent)
 		return
 	}
@@ -133,7 +138,7 @@ func (server *ApplicationServer) encodeAndPersist(response http.ResponseWriter, 
 			return
 		}
 
-		response.Header().Set("Content-Type", "application/json")
+		response.Header().Set("Content-Type", ContentTypeJson)
 		response.WriteHeader(http.StatusAccepted)
 		response.Write(jsonContent)
 		return

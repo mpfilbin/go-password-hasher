@@ -1,6 +1,8 @@
 package server
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func ExampleStatistics_IncrementRequestCount() {
 	stats := &statistics{}

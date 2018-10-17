@@ -1,6 +1,6 @@
 # Implementation of A Password Hasher in Go
 
-`go-password-hasher` provides an HTTP API for the encoding and persistence of passwords. `go-password-hasher`'s HTTP interface is available over port 8001.
+`go-password-hasher` provides an HTTP API for the encoding and persistence of passwords. `go-password-hasher`'s HTTP interface is available over port 8080.
 
 ## HTTP API
 
@@ -9,7 +9,7 @@ Clients request a new encoded password hash by issuing an HTTP `POST` request to
 
 **Request:**
 ```http
-POST http://localhost:8001/hash
+POST http://localhost:8080/hash
 password={password}
 ```
 
@@ -35,7 +35,7 @@ create request.
 
 **Request:**
 ```http
-GET http://localhost:8001/hash/{id}
+GET http://localhost:8080/hash/{id}
 ```
 
 Encoded passwords are returned to the client in plain text,
@@ -56,7 +56,7 @@ The `go-password-hasher` application server provides basic runtime performance s
 
 **Request:**
 ```http
-GET http://localhost:8001/stats
+GET http://localhost:8080/stats
 ```
 
 The response payload contains two values:
@@ -77,10 +77,10 @@ Date: Tue, 16 Oct 2018 13:34:45 GMT
 ```
 
 ### Graceful, Remote Shutdown
-The `go-password-hasher` application server may be remotely shut down by issuing an HTTP `GET` request to the `/shutdown` endpoint.
+The `go-password-hasher` application server may be remotely shut down by issuing an HTTP `POST` request to the `/shutdown` endpoint.
 
 ```http
-GET http://localhost:8001/shutdown
+POST http://localhost:8080/shutdown
 ```
 
 Once the request is issued, the application server will stop accepting future requests and handle all in-flight requests before terminating. Once the response is received no further requests may be issued.

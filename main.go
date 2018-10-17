@@ -6,5 +6,5 @@ import (
 
 func main() {
 	application := server.NewAppServer()
-	application.Listen(8001)
+	application.Listen(8080)
 }
